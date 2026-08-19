@@ -10,28 +10,31 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	pb "github.com/arisone/redcapital/api/pb"
-	"github.com/arisone/redcapital/internal/adapter"
 	domain "github.com/arisone/redcapital/internal/domain/notification"
+	"github.com/arisone/redcapital/internal/registry"
 )
 
 type NotificationService struct {
 	pb.UnimplementedNotificationServiceServer
-	Repository domain.Repository
-	Adapters   *adapter.Registry
+	Registry *registry.Registry
+}
+
+func New(reg *registry.Registry) *NotificationService {
+	return &NotificationService{Registry: reg}
 }
 
 func (s *NotificationService) SubmitNotification(ctx context.Context, req *pb.SubmitNotificationRequest) (*pb.SubmitNotificationResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "request is required")
 	}
-	if _, ok := s.Adapters.Get(req.Provider); !ok {
+	if _, ok := s.Registry.Adapter(req.Provider); !ok {
 		return nil, status.Errorf(codes.FailedPrecondition, "provider %q is not configured", req.Provider)
 	}
 	n, err := domain.New(req.Provider, req.EventType, req.IdempotencyKey, req.Payload, time.Now())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid notification: %v", err)
 	}
-	stored, reused, err := s.Repository.CreateOrGet(ctx, n)
+	stored, reused, err := s.Registry.Repository().CreateOrGet(ctx, n)
 	if err != nil {
 		if errors.Is(err, domain.ErrIdempotencyConflict) {
 			return nil, status.Error(codes.AlreadyExists, "idempotency key conflicts with an existing notification")
@@ -48,7 +51,7 @@ func (s *NotificationService) GetNotification(ctx context.Context, req *pb.GetNo
 	if req == nil || req.NotificationId == "" {
 		return nil, status.Error(codes.InvalidArgument, "notification_id is required")
 	}
-	n, err := s.Repository.Get(ctx, req.NotificationId)
+	n, err := s.Registry.Repository().Get(ctx, req.NotificationId)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			return nil, status.Error(codes.NotFound, "notification not found")
@@ -85,8 +88,6 @@ func mapStatus(s domain.Status) pb.NotificationStatus {
 		return pb.NotificationStatus_NOTIFICATION_STATUS_PENDING
 	case domain.StatusDelivering:
 		return pb.NotificationStatus_NOTIFICATION_STATUS_DELIVERING
-	case domain.StatusRetryWait:
-		return pb.NotificationStatus_NOTIFICATION_STATUS_RETRY_WAIT
 	case domain.StatusSucceeded:
 		return pb.NotificationStatus_NOTIFICATION_STATUS_SUCCEEDED
 	case domain.StatusDead:

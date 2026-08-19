@@ -47,10 +47,10 @@ func TestDeliverClassifiesStatus(t *testing.T) {
 	}
 }
 
-func TestDeliverNetworkFailureIsRetryable(t *testing.T) {
+func TestDeliverNetworkFailureIsUnknown(t *testing.T) {
 	adapter := New("http://127.0.0.1:1", nil, time.Second)
 	result := adapter.Deliver(context.Background(), domain.Notification{Payload: []byte(`{}`)})
-	if result.Outcome != domain.DeliveryRetryable {
-		t.Fatalf("expected retryable, got %v", result.Outcome)
+	if result.Outcome != domain.DeliveryUnknown {
+		t.Fatalf("expected unknown, got %v", result.Outcome)
 	}
 }

@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"strings"
 	"time"
@@ -38,9 +39,7 @@ func FromEnv() (Config, error) {
 		if err := json.Unmarshal([]byte(raw), &configured); err != nil {
 			return Config{}, fmt.Errorf("parse WEBHOOK_HEADERS_JSON: %w", err)
 		}
-		for key, value := range configured {
-			headers[key] = value
-		}
+		maps.Copy(headers, configured)
 	}
 	return Config{
 		GRPCAddr: env("GRPC_ADDR", ":9000"), HTTPAddr: env("HTTP_ADDR", ":8080"),

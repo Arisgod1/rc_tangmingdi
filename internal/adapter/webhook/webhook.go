@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"time"
 
@@ -17,11 +18,9 @@ type Adapter struct {
 }
 
 func New(url string, headers map[string]string, timeout time.Duration) *Adapter {
-	copy := make(map[string]string, len(headers))
-	for key, value := range headers {
-		copy[key] = value
-	}
-	return &Adapter{URL: url, Headers: copy, Client: &http.Client{Timeout: timeout}}
+	copy_ := make(map[string]string, len(headers))
+	maps.Copy(copy_, headers)
+	return &Adapter{URL: url, Headers: copy_, Client: &http.Client{Timeout: timeout}}
 }
 
 func (a *Adapter) Deliver(ctx context.Context, n domain.Notification) domain.DeliveryResult {
@@ -34,9 +33,14 @@ func (a *Adapter) Deliver(ctx context.Context, n domain.Notification) domain.Del
 	}
 	resp, err := a.Client.Do(req)
 	if err != nil {
-		return domain.DeliveryResult{Outcome: domain.DeliveryRetryable, Err: err}
+		return domain.DeliveryResult{Outcome: domain.DeliveryUnknown, Err: err}
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(resp.Body)
 	_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 4096))
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return domain.DeliveryResult{Outcome: domain.DeliverySucceeded, StatusCode: resp.StatusCode}

@@ -21,6 +21,7 @@ import (
 	"github.com/arisone/redcapital/internal/adapter/mock"
 	sqliterepo "github.com/arisone/redcapital/internal/datasource/notification"
 	domain "github.com/arisone/redcapital/internal/domain/notification"
+	"github.com/arisone/redcapital/internal/registry"
 	"github.com/arisone/redcapital/internal/service"
 	"github.com/arisone/redcapital/internal/worker"
 )
@@ -32,11 +33,11 @@ func TestSubmitGetAndHTTPGateway(t *testing.T) {
 	}
 	defer repo.Close()
 
-	registry := adapter.NewRegistry(map[string]adapter.Adapter{
+	reg := registry.NewFromDeps(repo, map[string]adapter.Adapter{
 		"mock": &mock.Adapter{Responses: []domain.DeliveryResult{{Outcome: domain.DeliverySucceeded, StatusCode: 200}}},
 	})
 	grpcServer := grpc.NewServer()
-	pb.RegisterNotificationServiceServer(grpcServer, &service.NotificationService{Repository: repo, Adapters: registry})
+	pb.RegisterNotificationServiceServer(grpcServer, service.New(reg))
 
 	grpcLis, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -64,7 +65,7 @@ func TestSubmitGetAndHTTPGateway(t *testing.T) {
 	go httpServer.Serve(httpLis)
 	t.Cleanup(func() { httpServer.Close() })
 
-	worker := worker.New(repo, registry, 10*time.Millisecond, 30*time.Second, nil)
+	worker := worker.New(reg, 10*time.Millisecond, 30*time.Second, nil)
 	workerCtx, cancelWorker := context.WithCancel(context.Background())
 	workerDone := make(chan struct{})
 	go func() {

@@ -26,6 +26,6 @@ option java_package = "com.google.api";
 option objc_class_prefix = "GAPI";
 
 extend google.protobuf.MethodOptions {
-  // See `HttpRule`.
+  // HttpRule 用于定义grpc到rest的映射
   HttpRule http = 72295728;
 }

@@ -12,9 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// LenientJSONPb lets the HTTP gateway accept payload both as base64 (standard
-// proto3 JSON) and as raw JSON bytes, which is friendlier for manual demos.
-// gRPC calls are unaffected.
+// LenientJSONPb accepts HTTP payload as raw JSON or base64; gRPC is unaffected.
 type LenientJSONPb struct {
 	runtime.JSONPb
 }

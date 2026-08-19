@@ -30,7 +30,6 @@ const (
 	NotificationStatus_NOTIFICATION_STATUS_ACCEPTED    NotificationStatus = 1
 	NotificationStatus_NOTIFICATION_STATUS_PENDING     NotificationStatus = 2
 	NotificationStatus_NOTIFICATION_STATUS_DELIVERING  NotificationStatus = 3
-	NotificationStatus_NOTIFICATION_STATUS_RETRY_WAIT  NotificationStatus = 4
 	NotificationStatus_NOTIFICATION_STATUS_SUCCEEDED   NotificationStatus = 5
 	NotificationStatus_NOTIFICATION_STATUS_DEAD        NotificationStatus = 6
 )
@@ -42,7 +41,6 @@ var (
 		1: "NOTIFICATION_STATUS_ACCEPTED",
 		2: "NOTIFICATION_STATUS_PENDING",
 		3: "NOTIFICATION_STATUS_DELIVERING",
-		4: "NOTIFICATION_STATUS_RETRY_WAIT",
 		5: "NOTIFICATION_STATUS_SUCCEEDED",
 		6: "NOTIFICATION_STATUS_DEAD",
 	}
@@ -51,7 +49,6 @@ var (
 		"NOTIFICATION_STATUS_ACCEPTED":    1,
 		"NOTIFICATION_STATUS_PENDING":     2,
 		"NOTIFICATION_STATUS_DELIVERING":  3,
-		"NOTIFICATION_STATUS_RETRY_WAIT":  4,
 		"NOTIFICATION_STATUS_SUCCEEDED":   5,
 		"NOTIFICATION_STATUS_DEAD":        6,
 	}
@@ -404,13 +401,12 @@ const file_notification_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12=\n" +
-	"\fdelivered_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\vdeliveredAt*\x85\x02\n" +
+	"\fdelivered_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\vdeliveredAt*\xe1\x01\n" +
 	"\x12NotificationStatus\x12#\n" +
 	"\x1fNOTIFICATION_STATUS_UNSPECIFIED\x10\x00\x12 \n" +
 	"\x1cNOTIFICATION_STATUS_ACCEPTED\x10\x01\x12\x1f\n" +
 	"\x1bNOTIFICATION_STATUS_PENDING\x10\x02\x12\"\n" +
-	"\x1eNOTIFICATION_STATUS_DELIVERING\x10\x03\x12\"\n" +
-	"\x1eNOTIFICATION_STATUS_RETRY_WAIT\x10\x04\x12!\n" +
+	"\x1eNOTIFICATION_STATUS_DELIVERING\x10\x03\x12!\n" +
 	"\x1dNOTIFICATION_STATUS_SUCCEEDED\x10\x05\x12\x1c\n" +
 	"\x18NOTIFICATION_STATUS_DEAD\x10\x062\xb7\x02\n" +
 	"\x13NotificationService\x12\x8b\x01\n" +
