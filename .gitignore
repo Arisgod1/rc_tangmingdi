@@ -1,0 +1,12 @@
+.DS_Store
+*.db
+*.db-shm
+*.db-wal
+bin/
+notification
+*.test
+*.out
+coverage.txt
+coverage.html
+.idea/
+.vscode/

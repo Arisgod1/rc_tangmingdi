@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package notification.v1;
+
+option go_package = "github.com/arisone/redcapital/api/pb;pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+
+service NotificationService {
+  rpc SubmitNotification(SubmitNotificationRequest) returns (SubmitNotificationResponse) {
+    option (google.api.http) = {
+      post: "/v1/notifications"
+      body: "*"
+    };
+  }
+  rpc GetNotification(GetNotificationRequest) returns (GetNotificationResponse) {
+    option (google.api.http) = {
+      get: "/v1/notifications/{notification_id}"
+    };
+  }
+}
+
+enum NotificationStatus {
+  NOTIFICATION_STATUS_UNSPECIFIED = 0;
+  NOTIFICATION_STATUS_ACCEPTED = 1;
+  NOTIFICATION_STATUS_PENDING = 2;
+  NOTIFICATION_STATUS_DELIVERING = 3;
+  NOTIFICATION_STATUS_RETRY_WAIT = 4;
+  NOTIFICATION_STATUS_SUCCEEDED = 5;
+  NOTIFICATION_STATUS_DEAD = 6;
+}
+
+message SubmitNotificationRequest {
+  string provider = 1;
+  string event_type = 2;
+  string idempotency_key = 3;
+  bytes payload = 4;
+}
+
+message SubmitNotificationResponse {
+  string notification_id = 1;
+  NotificationStatus status = 2;
+}
+
+message GetNotificationRequest {
+  string notification_id = 1;
+}
+
+message GetNotificationResponse {
+  string notification_id = 1;
+  string provider = 2;
+  string event_type = 3;
+  string idempotency_key = 4;
+  NotificationStatus status = 5;
+  int32 attempts = 6;
+  google.protobuf.Timestamp next_attempt_at = 7;
+  string last_error = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  google.protobuf.Timestamp delivered_at = 11;
+}
