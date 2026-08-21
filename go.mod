@@ -3,6 +3,7 @@ module github.com/arisone/redcapital
 go 1.26
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20250929231259-57b25ae835d4
 	google.golang.org/grpc v1.76.0
@@ -12,7 +13,6 @@ require (
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect

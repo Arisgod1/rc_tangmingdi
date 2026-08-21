@@ -2,8 +2,7 @@
 *.db
 *.db-shm
 *.db-wal
-bin/
-notification
+/notification
 *.test
 *.out
 coverage.txt
